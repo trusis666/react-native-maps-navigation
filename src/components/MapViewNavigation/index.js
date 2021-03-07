@@ -212,11 +212,12 @@ export default class MapViewNavigation extends Component {
     /**
      * updatePosition
      * @param coordinate
+     * @param heading
      * @param duration
      */
-    updatePosition(coordinate, duration = 0)
+    updatePosition(coordinate, heading, duration = 0)
     {
-        this.props.map().animateToCoordinate(coordinate, duration);
+        this.props.map().animateCamera({center: coordinate, heading: heading, zoom: this.props.navigationZoomLevel }, duration);
     }
 
     /**
@@ -226,7 +227,11 @@ export default class MapViewNavigation extends Component {
      */
     updateBearing(bearing, duration = false)
     {
-        this.props.map().animateToBearing(bearing, duration || this.props.animationDuration);
+        const region = {
+            latitude:this.state.position.latitude,
+            longitude:this.state.position.longitude
+        };
+        this.updatePosition(location, bearing, (duration || 0));
     }
 
     /**
@@ -282,9 +287,7 @@ export default class MapViewNavigation extends Component {
         // update position on map
         if(this.state.navigationMode == NavigationModes.NAVIGATION) {
 
-            this.updatePosition(position);
-
-            this.updateBearing(heading);
+            this.updatePosition(position, heading);
         }
 
         this.setState({position});
@@ -399,12 +402,11 @@ export default class MapViewNavigation extends Component {
         return this.prepareRoute(origin, destination, options, true).then(route => {
 
             const region = {
-                ...route.origin.coordinate,
-                ...this.getZoomValue(this.props.navigationZoomLevel),
+                latitude:parseFloat(route.origin.coordinate.latitude),
+                longitude:parseFloat(route.origin.coordinate.latitude)
             };
 
-            this.props.map().animateToRegion(region, this.props.animationDuration);
-            this.props.map().animateToViewingAngle(this.props.navigationViewingAngle, this.props.animationDuration);
+            this.props.animateCamera({ center: region, pitch: this.props.navigationViewingAngle, zoom: this.props.navigationZoomLevel }, this.props.animationDuration);            
 
             //this.updatePosition(route.origin.coordinate);
             this.updateBearing(route.initialBearing);
