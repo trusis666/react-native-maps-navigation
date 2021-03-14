@@ -406,7 +406,7 @@ export default class MapViewNavigation extends Component {
                 longitude:parseFloat(route.origin.coordinate.latitude)
             };
 
-            this.props.animateCamera({ center: region, pitch: this.props.navigationViewingAngle, zoom: this.props.navigationZoomLevel }, this.props.animationDuration);            
+            this.props.map().animateCamera({ center: region, pitch: this.props.navigationViewingAngle, zoom: this.props.navigationZoomLevel }, this.props.animationDuration);            
 
             //this.updatePosition(route.origin.coordinate);
             this.updateBearing(route.initialBearing);
